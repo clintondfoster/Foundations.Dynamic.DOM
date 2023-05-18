@@ -1,0 +1,90 @@
+// assign catList to an array of objects that looks like this:
+// const catsArray = [
+//   {
+//     name: 'Buttons',
+//     id: 3,
+//     adjective: 'friendly'
+//   }
+//   ...
+// ]
+const catList = catsArray;
+// track cats that have been adopted
+const adoptedCats = [];
+
+// select the DOM elements we'll work with
+const shelterSection = document.querySelector('.shelter')
+const searchInput = document.querySelector('.searchInput')
+const searchButton = document.querySelector('.searchButton')
+const sortButton = document.querySelector('.sortButton')
+
+// when the user clicks the search button, call the filterCats function with catList
+// and then render the result using the renderAllCats method
+searchButton.addEventListener('click', () => {
+  renderAllCats(filterCats(catList));
+})
+
+// when the user clicks the sort button, call the sortCats function with catList
+// and then render the result using the renderAllCats method
+sortButton.addEventListener('click', () => {
+  renderAllCats(sortCats(catList))
+})
+
+// the filterCats function takes an array of cats and returns an array of cats
+// the returned cats pass the test:
+// "the cat's name (lowercase) includes the current search input value (lowercase)"
+const filterCats = (cats) => cats.filter(c => c.name.toLowerCase().includes(searchInput.value.toLowerCase()))
+
+// the sortCats function takes an array of cats and returns an array of cats
+// the returned cats are in alphabetical order by name
+const sortCats = (cats) => {
+  return cats.sort((a,b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1)
+}
+
+// the adopt function takes a cat and adds it to the array of adopted cats
+// then it re-renders the cat list
+const adopt = (cat) => {
+  adoptedCats.push(cat)
+  renderAllCats(catList)
+}
+
+// render a gallery of cats to adopt
+const renderAllCats = (cats) => {
+  const elements = cats.map((cat) => renderCatCard(cat));
+  shelterSection.replaceChildren(...elements)
+}
+    // render a single cat adoption card
+const renderCatCard = (cat) => {
+  // create a card
+  const catCard = document.createElement('section');
+  catCard.className = 'card'
+  // create a name element
+  const catName = document.createElement('span');
+  catName.innerText = cat.name;
+  // create an image element
+  const catImg = document.createElement('img');
+  catImg.src = `img/cat${cat.id}.jpeg`
+  // create a description element
+  const catDesc = document.createElement('span');
+  catDesc.innerText = `${cat.name} is ${cat.adjective}`
+  // append the elements to the card
+  catCard.append(catName, catImg, catDesc)
+  if (!adoptedCats.includes(cat)){
+    // create and append "Adopt Me" button if cat is available
+    const adoptionButton = document.createElement('button');
+    adoptionButton.innerText = "Adopt Me!";
+    adoptionButton.addEventListener('click', () => {
+      adopt(cat)
+    })
+    catCard.append(adoptionButton)
+  } else {
+    // create and append "adopted" message if the cat has been adopted
+    const catAdoptedMsg = document.createElement('p');
+    catAdoptedMsg.innerText = `${cat.name} was adopted!`
+    catCard.append(catAdoptedMsg)
+  }
+  // return the card
+  return catCard;
+}
+
+// initial render of the catList
+renderAllCats(catList);
